@@ -1,3 +1,4 @@
+
 from setuptools import setup, find_packages
 
 setup(
@@ -14,4 +15,5 @@ setup(
         "Operating System :: OS Independent",  # Compatibility
     ],
     python_requires='>=3.6',  # Minimum Python version required
+
 )
