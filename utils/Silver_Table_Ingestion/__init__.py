@@ -1,161 +1,116 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 0,
-   "metadata": {
-    "application/vnd.databricks.v1+cell": {
-     "cellMetadata": {
-      "byteLimit": 2048000,
-      "rowLimit": 10000
-     },
-     "inputWidgets": {},
-     "nuid": "5bd22dc9-0d6d-461f-aa3a-fb00070ea127",
-     "showTitle": False,
-     "tableResultSettingsMap": {},
-     "title": ""
-    }
-   },
-   "outputs": [],
-   "source": [
-    "%python\n",
-    "# notebook2\n",
-    "\n",
-    "class ValueProcessor:\n",
-    "    def __init__(self, values):\n",
-    "        self.values = values\n",
-    "\n",
-    "    def create_table(self, user_input):\n",
-    "        if \"Application\" in user_input:\n",
-    "            table_name = f\"SILVER.FACT_{user_input.upper()}\"\n",
-    "            insert_table_sql = f\"\"\"\n",
-    "            INSERT INTO {table_name}(\n",
-    "            APPLICATION_ID,\n",
-    "            APPLICATION_NAME,\n",
-    "            SFDC_CREATED_DATE,\n",
-    "            SFDC_CREATED_BY,\n",
-    "            SFDC_LAST_MODIFIED_DATE,\n",
-    "            SFDC_LAST_MODIFIED_BY\n",
-    "            )\n",
-    "            Select\n",
-    "            app.id,\n",
-    "            app.name,\n",
-    "            app.CreatedDate,\n",
-    "            app.CreatedByid,\n",
-    "            app.LastModifiedDate,\n",
-    "            app.LastModifiedById\n",
-    "            from bronze.job_application app;\n",
-    "            \"\"\"\n",
-    "            spark.sql(insert_table_sql)\n",
-    "            print(f\"Data in the {table_name} inserted successfully!\")\n",
-    "\n",
-    "        elif \"Account\" in user_input:\n",
-    "            table_name = f\"SILVER.DIM_{user_input.upper()}\"\n",
-    "            insert_table_sql = f\"\"\"\n",
-    "            INSERT INTO {table_name}(\n",
-    "            ACCOUNT_ID,\n",
-    "            NAME,\n",
-    "            ADDRESS,\n",
-    "            INDUSTRY,\n",
-    "            SFDC_CREATED_DATE,\n",
-    "            SFDC_CREATED_BY,\n",
-    "            SFDC_LAST_MODIFIED_DATE,\n",
-    "            SFDC_LAST_MODIFIED_BY\n",
-    "            )\n",
-    "            Select\n",
-    "            acc.id,\n",
-    "            acc.name,\n",
-    "            acc.billingStreet,\n",
-    "            acc.industry,\n",
-    "            acc.CreatedDate,\n",
-    "            acc.CreatedByid,\n",
-    "            acc.LastModifiedDate,\n",
-    "            acc.LastModifiedById\n",
-    "            from bronze.account acc;\n",
-    "            \"\"\"\n",
-    "            spark.sql(insert_table_sql)\n",
-    "            print(f\"Data in the {table_name} inserted successfully!\")\n",
-    "\n",
-    "        elif \"Contact\" in user_input:\n",
-    "            table_name = f\"SILVER.DIM_{user_input.upper()}\"\n",
-    "            insert_table_sql = f\"\"\"\n",
-    "            INSERT INTO {table_name}(\n",
-    "            CONTACT_ID,\n",
-    "            NAME,\n",
-    "            MAILING_STREET,\n",
-    "            EMAIL,\n",
-    "            ACCOUNT_ID,\n",
-    "            ACCOUNT_NUMBER,\n",
-    "            TYPE,\n",
-    "            INDUSTRY,\n",
-    "            ANNULARY_REVENUE,\n",
-    "            ACTIVE,\n",
-    "            SFDC_CREATED_DATE,\n",
-    "            SFDC_CREATED_BY,\n",
-    "            SFDC_LAST_MODIFIED_DATE,\n",
-    "            SFDC_LAST_MODIFIED_BY\n",
-    "            )\n",
-    "            SELECT\n",
-    "            CON.Id,\n",
-    "            CON.Name,\n",
-    "            CON.MAILINGSTREET,\n",
-    "            CON.EMAIL,\n",
-    "            CON.AccountId,\n",
-    "            ACC.AccountNumber,\n",
-    "            ACC.Type,\n",
-    "            ACC.INDUSTRY,\n",
-    "            ACC.AnnualRevenue,\n",
-    "            ACC.Active__c,\n",
-    "            CON.CreatedDate,\n",
-    "            CON.CreatedById,\n",
-    "            CON.LastModifiedDate,\n",
-    "            CON.LastModifiedById\n",
-    "            FROM bronze.contact CON LEFT JOIN bronze.account ACC ON CON.AccountId = ACC.Id\n",
-    "            WHERE CON.ID NOT IN (SELECT CONTACT_ID FROM SILVER.dim_contact);\n",
-    "            \"\"\"\n",
-    "            spark.sql(insert_table_sql)\n",
-    "            print(f\"Data in the {table_name} inserted successfully!\")\n",
-    "        else:\n",
-    "            print(\"No valid table selected. Skipping table ingestion.\")\n",
-    "\n",
-    "    def process_value(self):\n",
-    "        for value in self.values:\n",
-    "            self.create_table(value)\n",
-    "        return f\"Processed values: {', '.join(self.values)}\"\n",
-    "\n",
-    "# Accept the multiselect values passed as a comma-separated string\n",
-    "dbutils.widgets.text(\"value\", \"\", \"Input Tables\")\n",
-    "value = dbutils.widgets.get(\"value\").split(\",\")\n",
-    "\n",
-    "print(value)\n",
-    "\n",
-    "processor = ValueProcessor(value)\n",
-    "result = processor.process_value()\n",
-    "\n",
-    "#Return the result\n",
-    "dbutils.notebook.exit(result)"
-   ]
-  }
- ],
- "metadata": {
-  "application/vnd.databricks.v1+notebook": {
-   "computePreferences": null,
-   "dashboards": [],
-   "environmentMetadata": {
-    "base_environment": "",
-    "client": "1"
-   },
-   "language": "sql",
-   "notebookMetadata": {
-    "pythonIndentUnit": 4
-   },
-   "notebookName": "All_Silver_Table_Ingestion",
-   "widgets": {}
-  },
-  "language_info": {
-   "name": "sql"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 0
-}
+%python
+# notebook2
+
+class ValueProcessor:
+    def __init__(self, values):
+        self.values = values
+
+    def create_table(self, user_input):
+        if "Application" in user_input:
+            table_name = f"SILVER.FACT_{user_input.upper()}"
+            insert_table_sql = f"""
+            INSERT INTO {table_name}(
+            APPLICATION_ID,
+            APPLICATION_NAME,
+            SFDC_CREATED_DATE,
+            SFDC_CREATED_BY,
+            SFDC_LAST_MODIFIED_DATE,
+            SFDC_LAST_MODIFIED_BY
+            )
+            Select
+            app.id,
+            app.name,
+            app.CreatedDate,
+            app.CreatedByid,
+            app.LastModifiedDate,
+            app.LastModifiedById
+            from bronze.job_application app;
+            """
+            spark.sql(insert_table_sql)
+            print(f"Data in the {table_name} inserted successfully!")
+
+        elif "Account" in user_input:
+            table_name = f"SILVER.DIM_{user_input.upper()}"
+            insert_table_sql = f"""
+            INSERT INTO {table_name}(
+            ACCOUNT_ID,
+            NAME,
+            ADDRESS,
+            INDUSTRY,
+            SFDC_CREATED_DATE,
+            SFDC_CREATED_BY,
+            SFDC_LAST_MODIFIED_DATE,
+            SFDC_LAST_MODIFIED_BY
+            )
+            Select
+            acc.id,
+            acc.name,
+            acc.billingStreet,
+            acc.industry,
+            acc.CreatedDate,
+            acc.CreatedByid,
+            acc.LastModifiedDate,
+            acc.LastModifiedById
+            from bronze.account acc;
+            """
+            spark.sql(insert_table_sql)
+            print(f"Data in the {table_name} inserted successfully!")
+
+        elif "Contact" in user_input:
+            table_name = f"SILVER.DIM_{user_input.upper()}"
+            insert_table_sql = f"""
+            INSERT INTO {table_name}(
+            CONTACT_ID,
+            NAME,
+            MAILING_STREET,
+            EMAIL,
+            ACCOUNT_ID,
+            ACCOUNT_NUMBER,
+            TYPE,
+            INDUSTRY,
+            ANNULARY_REVENUE,
+            ACTIVE,
+            SFDC_CREATED_DATE,
+            SFDC_CREATED_BY,
+            SFDC_LAST_MODIFIED_DATE,
+            SFDC_LAST_MODIFIED_BY
+            )
+            SELECT
+            CON.Id,
+            CON.Name,
+            CON.MAILINGSTREET,
+            CON.EMAIL,
+            CON.AccountId,
+            ACC.AccountNumber,
+            ACC.Type,
+            ACC.INDUSTRY,
+            ACC.AnnualRevenue,
+            ACC.Active__c,
+            CON.CreatedDate,
+            CON.CreatedById,
+            CON.LastModifiedDate,
+            CON.LastModifiedById
+            FROM bronze.contact CON LEFT JOIN bronze.account ACC ON CON.AccountId = ACC.Id
+            WHERE CON.ID NOT IN (SELECT CONTACT_ID FROM SILVER.dim_contact);
+            """
+            spark.sql(insert_table_sql)
+            print(f"Data in the {table_name} inserted successfully!")
+        else:
+            print("No valid table selected. Skipping table ingestion.")
+
+    def process_value(self):
+        for value in self.values:
+            self.create_table(value)
+        return f"Processed values: {', '.join(self.values)}"
+
+# Accept the multiselect values passed as a comma-separated string
+dbutils.widgets.text("value", "", "Input Tables")
+value = dbutils.widgets.get("value").split(",")
+
+print(value)
+
+processor = ValueProcessor(value)
+result = processor.process_value()
+
+#Return the result
+dbutils.notebook.exit(result)
