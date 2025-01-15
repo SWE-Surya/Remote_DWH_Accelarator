@@ -107,12 +107,11 @@ class ValueProcessor:
 # dbutils.widgets.text("value", "", "Input Tables")
 # value = dbutils.widgets.get("value").split(",")
 
-value = [account,application]
+value = ['account','application']
 
 print(value)
 
 processor = ValueProcessor(value)
 result = processor.process_value()
 
-#Return the result
-dbutils.notebook.exit(result)
+
