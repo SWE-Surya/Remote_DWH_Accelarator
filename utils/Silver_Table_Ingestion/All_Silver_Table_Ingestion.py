@@ -104,8 +104,10 @@ class ValueProcessor:
         return f"Processed values: {', '.join(self.values)}"
 
 # Accept the multiselect values passed as a comma-separated string
-dbutils.widgets.text("value", "", "Input Tables")
-value = dbutils.widgets.get("value").split(",")
+# dbutils.widgets.text("value", "", "Input Tables")
+# value = dbutils.widgets.get("value").split(",")
+
+value = [account,application]
 
 print(value)
 
