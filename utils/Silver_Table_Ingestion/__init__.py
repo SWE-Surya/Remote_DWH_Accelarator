@@ -11,7 +11,7 @@
      },
      "inputWidgets": {},
      "nuid": "5bd22dc9-0d6d-461f-aa3a-fb00070ea127",
-     "showTitle": 0,
+     "showTitle": False,
      "tableResultSettingsMap": {},
      "title": ""
     }
