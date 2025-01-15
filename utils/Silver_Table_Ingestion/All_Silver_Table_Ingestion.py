@@ -1,4 +1,4 @@
-%python
+
 # notebook2
 
 class ValueProcessor:
