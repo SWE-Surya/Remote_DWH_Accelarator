@@ -1,9 +1,11 @@
+%python
 class ValueProcessor:
-    def __init__(self, values):
+    def __init__(self, spark, values):
+        self.spark = spark
         self.values = values
 
     def print_val(self):
-        print("Value is ",values)
+        print("Value is ", self.values)
 
     def create_table(self, user_input):
         if "Application" in user_input:
@@ -26,7 +28,7 @@ class ValueProcessor:
             app.LastModifiedById
             from bronze.job_application app;
             """
-            spark.sql(insert_table_sql)
+            self.spark.sql(insert_table_sql)
             print(f"Data in the {table_name} inserted successfully!")
 
         elif "Account" in user_input:
@@ -53,7 +55,7 @@ class ValueProcessor:
             acc.LastModifiedById
             from bronze.account acc;
             """
-            spark.sql(insert_table_sql)
+            self.spark.sql(insert_table_sql)
             print(f"Data in the {table_name} inserted successfully!")
 
         elif "Contact" in user_input:
@@ -93,7 +95,7 @@ class ValueProcessor:
             FROM bronze.contact CON LEFT JOIN bronze.account ACC ON CON.AccountId = ACC.Id
             WHERE CON.ID NOT IN (SELECT CONTACT_ID FROM SILVER.dim_contact);
             """
-            spark.sql(insert_table_sql)
+            self.spark.sql(insert_table_sql)
             print(f"Data in the {table_name} inserted successfully!")
         else:
             print("No valid table selected. Skipping table ingestion.")
@@ -102,14 +104,3 @@ class ValueProcessor:
         for value in self.values:
             self.create_table(value)
         return f"Processed values: {', '.join(self.values)}"
-
-# Accept the multiselect values passed as a comma-separated string
-# dbutils.widgets.text("value", "", "Input Tables")
-# value = dbutils.widgets.get("value").split(",")
-
-# value = ['account','application']
-
-# print(value)
-
-# processor = ValueProcessor(value)
-# result = processor.process_value()
