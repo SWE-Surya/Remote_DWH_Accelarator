@@ -5,6 +5,9 @@ class ValueProcessor:
     def __init__(self, values):
         self.values = values
 
+    def print_val(self):
+        print("Value is ",values)
+
     def create_table(self, user_input):
         if "Application" in user_input:
             table_name = f"SILVER.FACT_{user_input.upper()}"
