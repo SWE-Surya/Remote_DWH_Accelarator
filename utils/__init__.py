@@ -1,5 +1,3 @@
-
-# notebook2
 class ValueProcessor:
     def __init__(self, values):
         self.values = values
