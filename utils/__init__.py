@@ -113,6 +113,3 @@ class ValueProcessor:
 
 # processor = ValueProcessor(value)
 # result = processor.process_value()
-
-
-
