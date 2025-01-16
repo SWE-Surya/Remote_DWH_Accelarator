@@ -1,6 +1,6 @@
 
 # notebook2
-
+from databricks.sdk.runtime import *
 class ValueProcessor:
     def __init__(self, values):
         self.values = values
