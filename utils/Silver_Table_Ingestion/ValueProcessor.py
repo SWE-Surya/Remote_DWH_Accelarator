@@ -1,6 +1,6 @@
-%python
+# %python
 # In utils/Silver_Table_Ingestion/ValueProcessor.py
-
+from databricks.sdk.runtime import *
 class ValueProcessor:
     def __init__(self, values, spark):
         self.values = values
