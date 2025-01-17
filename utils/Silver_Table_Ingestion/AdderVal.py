@@ -5,3 +5,6 @@ class AdderVal:
 
     def add(self):
         return self.a + self.b
+
+    def substract(self):
+        return self.a - self.b
