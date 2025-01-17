@@ -1,6 +1,7 @@
 class ValueProcessor:
-    def __init__(self, values):
+    def __init__(self, values, spark_session):
         self.values = values
+        self.spark = spark_session  # Store the spark session
 
     def create_table(self, user_input):
         if "Application" in user_input:
@@ -23,7 +24,7 @@ class ValueProcessor:
             app.LastModifiedById
             from bronze.job_application app;
             """
-            spark.sql(insert_table_sql)
+            self.spark.sql(insert_table_sql)
             print(f"Data in the {table_name} inserted successfully!")
 
         elif "Account" in user_input:
@@ -50,7 +51,7 @@ class ValueProcessor:
             acc.LastModifiedById
             from bronze.account acc;
             """
-            spark.sql(insert_table_sql)
+            self.spark.sql(insert_table_sql)
             print(f"Data in the {table_name} inserted successfully!")
 
         elif "Contact" in user_input:
@@ -90,7 +91,7 @@ class ValueProcessor:
             FROM bronze.contact CON LEFT JOIN bronze.account ACC ON CON.AccountId = ACC.Id
             WHERE CON.ID NOT IN (SELECT CONTACT_ID FROM SILVER.dim_contact);
             """
-            spark.sql(insert_table_sql)
+            self.spark.sql(insert_table_sql)
             print(f"Data in the {table_name} inserted successfully!")
         else:
             print("No valid table selected. Skipping table ingestion.")
@@ -99,4 +100,3 @@ class ValueProcessor:
         for value in self.values:
             self.create_table(value)
         return f"Processed values: {', '.join(self.values)}"
-
